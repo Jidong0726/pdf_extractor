@@ -7,7 +7,6 @@ Created on Mon Sep 21 23:07:41 2020
 
 from detect import pdf_reader
 import os
-import pandas as pd
 
 base_path = '1040_Samples/'
 reader = pdf_reader(popper_path = r'D:\Release-20.09.0\poppler-20.09.0\bin', 

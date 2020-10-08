@@ -17,12 +17,12 @@ import io
 class pdf_reader(object):
     def __init__(self, popper_path, tesseract_path):
         self.popper_path = popper_path
-        pytesseract.pytesseract.tesseract_cmd = tesseract_path
+        #pytesseract.pytesseract.tesseract_cmd = tesseract_path
         return
     
     def read_file(self, filepath):
         try:
-            if filepath.endswith('.pdf'):
+            if filepath.endswith('.pdf') or filepath.endswith('.PDF'):
                 images = self.pdf_pic_convert(filepath)
             else:
                 images = [Image.open(filepath)]
@@ -31,15 +31,14 @@ class pdf_reader(object):
         return images
     
     def pdf_pic_convert(self, pdfname):
-        images = convert_from_path(pdfname, poppler_path= self.popper_path, 
-                                   use_pdftocairo=True, )
+        #images = convert_from_path(pdfname, poppler_path= self.popper_path, use_pdftocairo=True)
+        images = convert_from_path(pdfname, use_pdftocairo=True)
         return images
     
     def form_1040(self, filename):
         images = self.read_file(filename)
         if images == []:
-            print ('cannot open target files')
-            return
+            return ('cannot open target files')
         number = None
         for i in range(len(images)):
             image = images[i]
@@ -59,10 +58,8 @@ class pdf_reader(object):
                 if number is not None:
                     return number
                 else:
-                    print ('cannot recognize')
-                    return number
-        print ('cannot recognize')
-        return number
+                    return ('cannot recognize, please try to upload an E-document or a clear scanned copy')
+        return 'cannot recognize, please try to upload an E-document or a clear scanned copy'
 
     def text_reader(self, filename):
         with open(filename, 'rb') as fh:
@@ -79,26 +76,29 @@ class pdf_reader(object):
                 text = fake_file_handle.getvalue()
                 if 'Profit or Loss From Business' in text:
                     number = text.replace('\x0c','').split('.')[:-2]
-                    if len(number[-1])<=2:
-                        res = number[-2]+'.'+number[-1]
-                        res = float(res.replace(',',''))
-                    else:
-                        res = float(number[-1].replace(',',''))
+                    try:
+                        if len(number[-1])<=2:
+                            res = number[-2]+'.'+number[-1]
+                            res = float(res.replace(',',''))
+                        else:
+                            res = float(number[-1].replace(',',''))
+                    except:
+                        return ('cannot recognize, please try to upload an E-document or a clear scanned copy')
                     # close open handles
                     converter.close()
                     fake_file_handle.close()
                     return res
             converter.close()
             fake_file_handle.close()
-        return
+        return ('cannot recognize, please try to upload an E-document or a clear scanned copy')
 
 if __name__ == '__main__':
-    file = '1040_Samples/1040 Schedule C 14.pdf'
+    file = '1040_Samples/1040 Schedule C 1.pdf'
     reader = pdf_reader(popper_path = r'D:\Release-20.09.0\poppler-20.09.0\bin', 
                         tesseract_path = r'D:\image_reader\tesseract.exe')
     
-    solu = reader.text_reader(file)
-    #solu = reader.form_1040(file)
+    #solu = reader.text_reader(file)
+    solu = reader.form_1040(file)
 
     
     
