@@ -33,14 +33,13 @@ def limit_remote_addr():
 def operate_detector():
     data = request.get_json()
     try:
-        sub_id = data['submission_id']
         filename = data['filename']
     except:
         return ('parameters not found')
     warnings.filterwarnings("ignore")
     reader = pdf_reader(popper_path = r'D:\Release-20.09.0\poppler-20.09.0\bin', 
                         tesseract_path = r'D:\image_reader\tesseract.exe')
-    path = os.path.join(BASE_URL, sub_id, filename)
+    path = os.path.join(BASE_URL, str(filename))
     if filename.endswith('.pdf') or filename.endswith('.PDF'):
             number = reader.text_reader(path)
             if isinstance(number, str):
